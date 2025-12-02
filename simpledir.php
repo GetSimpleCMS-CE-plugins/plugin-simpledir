@@ -1,11 +1,4 @@
 <?php
-/*
-  Plugin Name: SimpleDir
-  Description: a GetSimple CMS plugin to provide directory listings
-  Version: 0.4
-  Author: Rob Antonishen (updated by Lawrence Okoth-Odida)
-  Author URI: http://ffaat.poweredbyclear.com/
-*/
 
 // == Constants ==
 define('SIMPLEDIR', basename(__FILE__, '.php'));
@@ -22,14 +15,14 @@ i18n_merge(SIMPLEDIR) || i18n_merge(SIMPLEDIR, 'en_US');
 
 // == Register plugin ==
 register_plugin(
-  SIMPLEDIR,
-  simpledir_i18n('PLUGIN_TITLE'),
-  '0.4',
-  'Lawrence Okoth-Odida',
-  'https://github.com/lokothodida/',
-  simpledir_i18n('PLUGIN_DESC'),
-  'plugins',
-  'simpledir_config'
+	SIMPLEDIR,
+	simpledir_i18n('PLUGIN_TITLE'),
+	'1.0',
+	'CE Team ',
+	'https://getsimple-ce.ovh/ce-plugins',
+	simpledir_i18n('PLUGIN_DESC'),
+	'plugins',
+	'simpledir_config'
 );
 
 // == Register actions and filters ==
@@ -38,56 +31,52 @@ add_action('plugins-sidebar','createSideMenu', array(SIMPLEDIR, simpledir_i18n('
 // Placeholder filter
 add_filter('content','simpledir_display');
 
-// == Register styles and scripts==
-// DataTables
-register_style('jquery-datatables', 'https://cdn.datatables.net/1.10.11/css/jquery.dataTables.min.css', null, 'screen');
-register_script('jquery-datatables', 'https://cdn.datatables.net/1.10.11/js/jquery.dataTables.min.js', null, FALSE);
-
-queue_style('jquery-datatables', GSFRONT);
-queue_script('jquery', GSFRONT);
-queue_script('jquery-datatables', GSFRONT);
+// == Register styles ==
+// SimpleDir responsive styles
+register_style('simpledir-css', SIMPLEDIR_PLUGINURL . 'css/simpledir.css', null, 'screen');
+queue_style('simpledir-css', GSFRONT);
 
 // == Functions ==
 // Admin Panel
 function simpledir_config() {
-  // Load admin functions
-  include(SIMPLEDIR_PLUGINPATH . 'admin_functions.php');
+	// Load admin functions
+	include(SIMPLEDIR_PLUGINPATH . 'admin_functions.php');
 
-  // Process POST form
-  if (!empty($_POST)) {
-    $data = array();
+	// Process POST form
+	if (!empty($_POST)) {
+		$data = array();
 
-    // Validation
-    if (isset($_POST['dirpath'])) {
-      $data['dirpath'] = urldecode($_POST['dirpath']);
-    }
+		// Validation
+		if (isset($_POST['dirpath'])) {
+			$data['dirpath'] = urldecode($_POST['dirpath']);
+		}
 
-    if (isset($_POST['urlpath'])) {
-      $data['urlpath'] = urldecode($_POST['urlpath']);
-    }
+		if (isset($_POST['urlpath'])) {
+			$data['urlpath'] = urldecode($_POST['urlpath']);
+		}
 
-    if (isset($_POST['ignore'])) {
-      $data['ignore'] = explode(',', urldecode($_POST['ignore']));
-    }
+		if (isset($_POST['ignore'])) {
+			$data['ignore'] = explode(',', urldecode($_POST['ignore']));
+		}
 
-    $succ = simpledir_saveconf($data);
+		$succ = simpledir_saveconf($data);
 
-    if ($succ) {
-      simpledir_admin_message('updated', i18n_r('SETTINGS_UPDATED'));
-    } else {
-      simpledir_admin_message('error', i18n_r('ER_SETTINGS_UPD'));
-    }
-  }
+		if ($succ) {
+			simpledir_admin_message('updated', i18n_r('SETTINGS_UPDATED'));
+		} else {
+			simpledir_admin_message('error', i18n_r('ER_SETTINGS_UPD'));
+		}
+	}
 
-  // Load config
-  $simpledir_conf = simpledir_loadconf(true);
+	// Load config
+	$simpledir_conf = simpledir_loadconf(true);
 
-  // Settings Page
-  include(SIMPLEDIR_PLUGINPATH . 'save_config.php');
+	// Settings Page
+	include(SIMPLEDIR_PLUGINPATH . 'save_config.php');
 }
 
 // Frontend Display
 function simpledir_display($contents) {
-  require_once(SIMPLEDIR_PLUGINPATH . 'display_functions.php');
-  return preg_replace_callback('/\(% simpledir(.*?)%\)/i', 'simpledir_display_callback', $contents);
+	require_once(SIMPLEDIR_PLUGINPATH . 'display_functions.php');
+	return preg_replace_callback('/\(% simpledir(.*?)%\)/i', 'simpledir_display_callback', $contents);
 }
